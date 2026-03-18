@@ -1,0 +1,78 @@
+name: Backend Tests & Deployment
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'DevTinder-backebd/**'
+      - '.github/workflows/backend*.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'DevTinder-backebd/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: 'DevTinder-backebd/package-lock.json'
+    
+    - name: Install dependencies
+      run: cd DevTinder-backebd && npm ci
+    
+    - name: Run linting
+      run: cd DevTinder-backebd && npm run lint --if-present
+    
+    - name: Run tests
+      run: cd DevTinder-backebd && npm test --if-present
+    
+    - name: Check build
+      run: cd DevTinder-backebd && npm run build --if-present
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Deploy to Render
+      run: |
+        curl -X POST https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
+      env:
+        RENDER_SERVICE_ID: ${{ secrets.RENDER_BACKEND_SERVICE_ID }}
+        RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+    
+    - name: Health Check
+      run: |
+        sleep 30
+        curl -f https://devtinder-backend.onrender.com/health || exit 1
+
+  security:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Run security audit
+      run: cd DevTinder-backebd && npm audit --production --audit-level=high || true
+    
+    - name: Check for secrets
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./DevTinder-backebd
+        base: ${{ github.event.repository.default_branch }}
+        head: HEAD
