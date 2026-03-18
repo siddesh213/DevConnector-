@@ -22,8 +22,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:3000",
-  process.env.FRONTEND_URL,
-  process.env.PRODUCTION_FRONTEND_URL,
+  process.env.FRONTEND_URL
 ].filter(Boolean); // Remove undefined values
 
 const server = createServer(app);
@@ -215,7 +214,7 @@ conncectdb().then(() => {
 ╔════════════════════════════════════════╗
 ║    🚀 DevTinder Server Started         ║
 ╠════════════════════════════════════════╣
-║  Server: http://localhost:${PORT}       
+║  Server: Server: running on port ${PORT}    
 ║  Environment: ${process.env.NODE_ENV || 'development'}
 ║  WebSocket: Enabled (WebSocket + Poll) ║
 ╚════════════════════════════════════════╝
