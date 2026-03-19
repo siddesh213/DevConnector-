@@ -97,17 +97,31 @@ getuserrequest.get("/feed", UserAuth, async (req, res) => {
     if (limit > 20) limit = 10;
     const skip = (page - 1) * limit;
 
-    // ✅ Find all connection requests related to this user (except rejected/ignored)
-    const existingConnections = await ConnectionRequestModel.find({
+    // ✅ Find connections to exclude:
+    // 1. People I sent requests to (interested/accepted)
+    const sentRequests = await ConnectionRequestModel.find({
+      FromUserId: loggedUser._id,
+      Status: { $in: ["interested", "accepted"] },
+    }).select(["ToUserid"]);
+
+    // 2. People I'm already connected to
+    const acceptedConnections = await ConnectionRequestModel.find({
       $or: [
-        { FromUserId: loggedUser._id, Status: { $in: ["interested", "accepted"] } },
-        { ToUserid: loggedUser._id, Status: { $in: ["interested", "accepted"] } },
+        { FromUserId: loggedUser._id, Status: "accepted" },
+        { ToUserid: loggedUser._id, Status: "accepted" },
       ],
     }).select(["FromUserId", "ToUserid"]);
 
-    // ✅ Collect all IDs to exclude (not already approached or already connected)
+    // ✅ Collect all IDs to exclude
     const excludeIds = [loggedUser._id]; // Always exclude self
-    existingConnections.forEach((conn) => {
+    
+    // Exclude people I sent requests to
+    sentRequests.forEach((conn) => {
+      if (conn.ToUserid) excludeIds.push(conn.ToUserid);
+    });
+
+    // Exclude people already connected
+    acceptedConnections.forEach((conn) => {
       if (conn.FromUserId && !conn.FromUserId.equals(loggedUser._id)) {
         excludeIds.push(conn.FromUserId);
       }
