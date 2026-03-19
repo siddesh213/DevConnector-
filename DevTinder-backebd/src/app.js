@@ -22,6 +22,8 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:3000",
+  "https://devconnect-live.vercel.app",
+  "https://devconnect-frontend-1ri7.vercel.app",
   process.env.FRONTEND_URL
 ].filter(Boolean); // Remove undefined values
 
