@@ -90,6 +90,7 @@ getuserrequest.get("/connection/stats", UserAuth, async (req, res) => {
 getuserrequest.get("/feed", UserAuth, async (req, res) => {
   try {
     const loggedUser = req.User;
+    console.log("🔍 Feed Request - Logged User ID:", loggedUser._id);
 
     const page = parseInt(req.query.page) || 1;
     let limit = parseInt(req.query.limit) || 10;
@@ -114,6 +115,8 @@ getuserrequest.get("/feed", UserAuth, async (req, res) => {
         excludeIds.push(conn.ToUserid);
       }
     });
+
+    console.log("🚫 Excluding IDs:", excludeIds.map(id => id.toString()));
 
     // ✅ Fetch all users except excluded ones
     let query = {
@@ -145,6 +148,9 @@ getuserrequest.get("/feed", UserAuth, async (req, res) => {
       ])
       .skip(skip)
       .limit(limit);
+
+    console.log("✅ Feed Users Count:", feedUsers.length);
+    console.log("📋 Returned User IDs:", feedUsers.map(u => u._id.toString()));
 
     if (!feedUsers || feedUsers.length === 0) {
       return res.json({
