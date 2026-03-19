@@ -105,15 +105,19 @@ getuserrequest.get("/feed", UserAuth, async (req, res) => {
     }).select(["FromUserId", "ToUserid"]);
 
     // ✅ Collect all IDs to exclude (including self)
-    const excludeIds = new Set([loggedUser._id.toString()]);
+    const excludeIds = [loggedUser._id]; // Use ObjectId directly, not string
     existingConnections.forEach((conn) => {
-      if (conn.FromUserId) excludeIds.add(conn.FromUserId.toString());
-      if (conn.ToUserid) excludeIds.add(conn.ToUserid.toString());
+      if (conn.FromUserId && !conn.FromUserId.equals(loggedUser._id)) {
+        excludeIds.push(conn.FromUserId);
+      }
+      if (conn.ToUserid && !conn.ToUserid.equals(loggedUser._id)) {
+        excludeIds.push(conn.ToUserid);
+      }
     });
 
     // ✅ Fetch all users except excluded ones
     let query = {
-      _id: { $nin: Array.from(excludeIds) },
+      _id: { $nin: excludeIds },
     };
 
     // ✅ (optional) Only filter by profile completeness if user’s profile is complete
