@@ -88,13 +88,6 @@ React Router v6          → Client-side routing
 Vite                     → Lightning-fast build tool
 ```
 
-### Infrastructure
-```
-MongoDB Atlas            → Cloud database
-Render                   → Backend deployment
-Vercel                   → Frontend deployment
-GitHub                   → Version control & CI/CD
-```
 
 ---
 
@@ -317,17 +310,6 @@ FRONTEND_URL=http://localhost:5174
 BASE_URL=http://localhost:3001
 ```
 
-### Frontend (.env.local)
-```env
-VITE_BASE_URL=http://localhost:3001
-VITE_API_BASE_URL=http://localhost:3001
-```
-
-### Frontend (.env.production)
-```env
-VITE_BASE_URL=https://your-backend.onrender.com
-VITE_API_BASE_URL=https://your-backend.onrender.com
-```
 
 ---
 
@@ -372,7 +354,7 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file for
 
 ## 🙋 Support
 
-- 📧 Email: support@devtinder.dev
+- 📧 Email: siddeshh.s.k@gmail.com
 - 🐛 Report bugs on [GitHub Issues](https://github.com/yourusername/DevTinder/issues)
 - 💡 Feature requests welcome!
 
