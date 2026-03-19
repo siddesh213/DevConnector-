@@ -97,61 +97,34 @@ getuserrequest.get("/feed", UserAuth, async (req, res) => {
     if (limit > 20) limit = 10;
     const skip = (page - 1) * limit;
 
-    // ✅ Find connections to exclude:
-    // 1. People I sent requests to (interested/accepted)
-    const sentRequests = await ConnectionRequestModel.find({
-      FromUserId: loggedUser._id,
-      Status: { $in: ["interested", "accepted"] },
-    }).select(["ToUserid"]);
-
-    // 2. People I'm already connected to
-    const acceptedConnections = await ConnectionRequestModel.find({
+    // ✅ Find ALL connections (both I sent and received)
+    const allConnections = await ConnectionRequestModel.find({
       $or: [
-        { FromUserId: loggedUser._id, Status: "accepted" },
-        { ToUserid: loggedUser._id, Status: "accepted" },
+        { FromUserId: loggedUser._id },
+        { ToUserid: loggedUser._id },
       ],
-    }).select(["FromUserId", "ToUserid"]);
+    }).select(["FromUserId", "ToUserid", "Status"]);
 
-    // ✅ Collect all IDs to exclude
-    const excludeIds = [loggedUser._id]; // Always exclude self
-    
-    // Exclude people I sent requests to
-    sentRequests.forEach((conn) => {
-      if (conn.ToUserid) excludeIds.push(conn.ToUserid);
-    });
-
-    // Exclude people already connected
-    acceptedConnections.forEach((conn) => {
-      if (conn.FromUserId && !conn.FromUserId.equals(loggedUser._id)) {
-        excludeIds.push(conn.FromUserId);
-      }
-      if (conn.ToUserid && !conn.ToUserid.equals(loggedUser._id)) {
-        excludeIds.push(conn.ToUserid);
+    // ✅ Exclude interested/accepted connections
+    const excludeIdsSet = new Set([loggedUser._id.toString()]);
+    allConnections.forEach((conn) => {
+      if (conn.Status === "interested" || conn.Status === "accepted") {
+        if (conn.FromUserId?.toString()) excludeIdsSet.add(conn.FromUserId.toString());
+        if (conn.ToUserid?.toString()) excludeIdsSet.add(conn.ToUserid.toString());
       }
     });
+    const excludeIds = Array.from(excludeIdsSet);
 
     console.log("🚫 Excluding IDs:", excludeIds.map(id => id.toString()));
 
-    // ✅ Fetch all users except excluded ones
+    // ✅ Fetch all users except excluded ones (NO filters)
     let query = {
       _id: { $nin: excludeIds },
     };
 
-    // ✅ (optional) Only filter by profile completeness if user’s profile is complete
-    const loggedUserData = await UserModel.findById(loggedUser._id);
-    const hasCompleteProfile =
-      loggedUserData.PhotoUrl &&
-      loggedUserData.About &&
-      loggedUserData.Skills &&
-      loggedUserData.Skills.length > 0;
-
-    if (hasCompleteProfile) {
-      query.PhotoUrl = { $exists: true, $ne: "" };
-      query.About = { $exists: true, $ne: "" };
-    }
-
     const feedUsers = await UserModel.find(query)
       .select([
+        "_id",
         "FirstName",
         "LastName",
         "Age",
@@ -161,19 +134,30 @@ getuserrequest.get("/feed", UserAuth, async (req, res) => {
         "PhotoUrl",
       ])
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .lean();
 
     console.log("✅ Feed Users Count:", feedUsers.length);
-    console.log("📋 Returned User IDs:", feedUsers.map(u => u._id.toString()));
 
     if (!feedUsers || feedUsers.length === 0) {
       return res.json({
         users: [],
-        info: "No new users available right now.",
+        page,
+        message: "No new developers available",
+        hasMore: false,
       });
     }
 
-    return res.json({ users: feedUsers });
+    // ✅ Get total available for pagination
+    const totalAvailable = await UserModel.countDocuments(query);
+    const hasMore = skip + feedUsers.length < totalAvailable;
+
+    return res.json({
+      users: feedUsers,
+      page,
+      totalAvailable,
+      hasMore,
+    });
   } catch (err) {
     console.error("Feed Error:", err.message);
     res.status(500).json({ error: err.message });
