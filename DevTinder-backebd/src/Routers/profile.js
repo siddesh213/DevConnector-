@@ -51,9 +51,8 @@ ProfileRouter.post("/profile/upload", UserAuth, upload.single("photo"), async (r
 
     const loggedInUser = req.User;
 
-    const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
-    loggedInUser.PhotoUrl = `${baseUrl}/uploads/${req.file.filename}`;
-
+    // ✅ Cloudinary stores the URL in path property
+    loggedInUser.PhotoUrl = req.file.path;
 
     await loggedInUser.save();
 
