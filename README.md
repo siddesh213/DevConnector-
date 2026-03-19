@@ -217,7 +217,7 @@ npm run dev
 #### 4. Access Application
 - **Frontend**: [http://localhost:5174](http://localhost:5174)
 - **Backend**: [http://localhost:3001](http://localhost:3001)
-- **Health Check**: [http://localhost:3001/health](http://localhost:3001/health)
+
 
 ### Testing the Application
 1. **Create two accounts** in different browsers
@@ -228,34 +228,6 @@ npm run dev
 
 ---
 
-## 🌐 Deployment
-
-### ✅ Production Ready
-The application is fully production-ready with comprehensive deployment guides. See [DEPLOYMENT_READINESS.md](DEPLOYMENT_READINESS.md) for complete instructions.
-
-### Quick Deployment
-
-#### Backend → Render.com
-```bash
-1. Push code to GitHub
-2. Create account on Render
-3. Connect GitHub repository
-4. Add environment variables
-5. Deploy (auto-deploys on future pushes)
-```
-
-#### Frontend → Vercel
-```bash
-1. Import GitHub repo to Vercel
-2. Add environment variables
-3. Deploy (auto-builds and deploys)
-```
-
-**Deployment time**: ~10 minutes | **Cost**: Free tier available
-
----
-
-## 📈 Key Optimizations
 
 ### Backend Performance
 - ✅ Indexed MongoDB queries (5-10ms response time)
@@ -406,71 +378,9 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file for
 
 ---
 
-<div align="center">
+<
 
-### Made with ❤️ by [Your Name]
 
-#### ⭐ If you found this helpful, please star this repository!
-
-[⬆ back to top](#-devtinder---connect-with-developer-talent)
-
-</div>
-2. Install dependencies for both frontend and backend:
-
-```bash
-# Backend
-cd DevTinder-backebd
-npm install
-
-# Frontend
-cd code (3)
-npm install
-```
-
-## Development
-
-1. Start the backend server:
-```bash
-cd DevTinder-backebd
-npm run dev
-```
-
-2. Start the frontend development server:
-```bash
-cd code (3)
-npm run dev
-```
-
-The application will be available at:
-- Frontend: http://localhost:5173 (or 5174 if 5173 is in use)
-- Backend: http://localhost:3001
-
-## Production Build
-
-### Backend
-```bash
-cd DevTinder-backebd
-npm start
-```
-
-### Frontend
-```bash
-cd code (3)
-npm run build
-npm run preview
-```
-
-## Deployment
-
-### Backend Deployment
-1. Set environment variables in your hosting platform
-2. Use `npm start` as the start command
-3. Ensure MongoDB connection string is properly configured
-
-### Frontend Deployment
-1. Build the project: `npm run build`
-2. Deploy the `dist` folder to your static hosting service
-3. Update `VITE_BASE_URL` to point to your deployed backend
 
 ## WebSocket Features
 
