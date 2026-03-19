@@ -355,7 +355,7 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file for
 ## 🙋 Support
 
 - 📧 Email: siddeshh.s.k@gmail.com
-- 🐛 Report bugs on [GitHub Issues](https://github.com/yourusername/DevTinder/issues)
+- 🐛 Report bugs on [GitHub Issues](https://github.com/yourusername/DevConnector/issues)
 - 💡 Feature requests welcome!
 
 ---
