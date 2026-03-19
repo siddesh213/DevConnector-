@@ -86,7 +86,7 @@ const UserCard = ({ user }) => {
 
           <button
             className="btn bg-gradient-to-r from-green-500 to-emerald-600 border-none text-white px-6 hover:shadow-lg transition-all"
-            onClick={() =>handleSendRequest("interested", _id)}
+            onClick={() => handleSendRequest("interested", _id)}
           >
             ❤️ Interested
           </button>
